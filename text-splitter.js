@@ -5,17 +5,17 @@ const LBR_INSEPARATABLE_REGEXP = /[―]/u;
 
 class TextSplitter {
   constructor(root, options) {
-    this.root = root;
+    this.rootElement = root;
     this.defaults = {
       concatChar: false,
       lineBreakingRules: true,
       wordSegmenter: false,
     };
     this.settings = { ...this.defaults, ...options };
-    this.original = this.root.innerHTML;
-    this.dom = this.root.cloneNode(true);
-    this.words = [];
-    this.chars = [];
+    this.original = this.rootElement.innerHTML;
+    this.domElement = this.rootElement.cloneNode(true);
+    this.wordElements = [];
+    this.charElements = [];
     this.initialize();
   }
 
@@ -25,7 +25,7 @@ class TextSplitter {
     if (this.settings.lineBreakingRules && !this.settings.concatChar) this.lbr('word');
     this.split('char');
     if (this.settings.lineBreakingRules && this.settings.concatChar) this.lbr('char');
-    this.words.forEach((word, i) => {
+    this.wordElements.forEach((word, i) => {
       word.setAttribute('translate', 'no');
       word.style.setProperty('--word-index', i);
       if (!word.hasAttribute('data-whitespace')) {
@@ -47,24 +47,24 @@ class TextSplitter {
         word.append(alt);
       }
     });
-    this.chars.forEach((char, i) => {
+    this.charElements.forEach((char, i) => {
       char.setAttribute('aria-hidden', 'true');
       char.style.setProperty('--char-index', i);
     });
-    this.dom.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])').forEach(span => {
+    this.domElement.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])').forEach(span => {
       span.style.setProperty('display', 'inline-block');
       span.style.setProperty('white-space', 'nowrap');
     });
-    this.root.replaceChildren(...this.dom.childNodes);
-    this.root.style.setProperty('--word-length', this.words.length);
-    this.root.style.setProperty('--char-length', this.chars.length);
-    [...this.root.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
+    this.rootElement.replaceChildren(...this.domElement.childNodes);
+    this.rootElement.style.setProperty('--word-length', this.wordElements.length);
+    this.rootElement.style.setProperty('--char-length', this.charElements.length);
+    [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
       if (window.getComputedStyle(whitespace).getPropertyValue('display') !== 'inline') whitespace.innerHTML = '&nbsp;';
     });
-    this.root.setAttribute('data-text-splitter-initialized', '');
+    this.rootElement.setAttribute('data-text-splitter-initialized', '');
   }
 
-  nobr(node = this.dom) {
+  nobr(node = this.domElement) {
     if (node.nodeType === Node.TEXT_NODE) {
       let text = node.textContent;
       let matches = [...text.matchAll(NOBR_REGEXP)];
@@ -87,7 +87,7 @@ class TextSplitter {
     }
   }
 
-  split(by, node = this.dom) {
+  split(by, node = this.domElement) {
     let list = this[`${by}s`];
     [...node.childNodes].forEach(node => {
       if (node.nodeType === Node.TEXT_NODE) {
@@ -150,7 +150,7 @@ class TextSplitter {
       if (LBR_INSEPARATABLE_REGEXP.test(item.textContent)) concat(item, LBR_INSEPARATABLE_REGEXP, i);
     });
     if (by === 'char') {
-      this.dom.querySelectorAll('[data-word]:not([data-whitespace])').forEach(span => {
+      this.domElement.querySelectorAll('[data-word]:not([data-whitespace])').forEach(span => {
         if (span.textContent) {
           span.setAttribute('data-word', span.textContent);
         } else {
@@ -161,9 +161,9 @@ class TextSplitter {
   }
 
   revert() {
-    this.root.style.removeProperty('--word-length');
-    this.root.style.removeProperty('--char-length');
-    this.root.innerHTML = this.original;
+    this.rootElement.style.removeProperty('--word-length');
+    this.rootElement.style.removeProperty('--char-length');
+    this.rootElement.innerHTML = this.original;
   }
 }
 

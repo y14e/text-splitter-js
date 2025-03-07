@@ -10,26 +10,26 @@ type TextSplitterOptions = {
 };
 
 class TextSplitter {
-  root: HTMLElement;
+  rootElement: HTMLElement;
   defaults: TextSplitterOptions;
   settings: TextSplitterOptions;
   original: string;
-  dom: HTMLElement;
-  words: HTMLElement[];
-  chars: HTMLElement[];
+  domElement: HTMLElement;
+  wordElements: HTMLElement[];
+  charElements: HTMLElement[];
 
   constructor(root: HTMLElement, options?: Partial<TextSplitterOptions>) {
-    this.root = root;
+    this.rootElement = root;
     this.defaults = {
       concatChar: false,
       lineBreakingRules: true,
       wordSegmenter: false,
     };
     this.settings = { ...this.defaults, ...options };
-    this.original = this.root.innerHTML;
-    this.dom = this.root.cloneNode(true) as HTMLElement;
-    this.words = [];
-    this.chars = [];
+    this.original = this.rootElement.innerHTML;
+    this.domElement = this.rootElement.cloneNode(true) as HTMLElement;
+    this.wordElements = [];
+    this.charElements = [];
     this.initialize();
   }
 
@@ -39,7 +39,7 @@ class TextSplitter {
     if (this.settings.lineBreakingRules && !this.settings.concatChar) this.lbr('word');
     this.split('char');
     if (this.settings.lineBreakingRules && this.settings.concatChar) this.lbr('char');
-    this.words.forEach((word, i) => {
+    this.wordElements.forEach((word, i) => {
       word.setAttribute('translate', 'no');
       word.style.setProperty('--word-index', String(i));
       if (!word.hasAttribute('data-whitespace')) {
@@ -61,24 +61,24 @@ class TextSplitter {
         word.append(alt);
       }
     });
-    this.chars.forEach((char, i) => {
+    this.charElements.forEach((char, i) => {
       char.setAttribute('aria-hidden', 'true');
       char.style.setProperty('--char-index', String(i));
     });
-    this.dom.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])').forEach(span => {
+    this.domElement.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])').forEach(span => {
       (span as HTMLElement).style.setProperty('display', 'inline-block');
       (span as HTMLElement).style.setProperty('white-space', 'nowrap');
     });
-    this.root.replaceChildren(...this.dom.childNodes);
-    this.root.style.setProperty('--word-length', String(this.words.length));
-    this.root.style.setProperty('--char-length', String(this.chars.length));
-    [...this.root.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
+    this.rootElement.replaceChildren(...this.domElement.childNodes);
+    this.rootElement.style.setProperty('--word-length', String(this.wordElements.length));
+    this.rootElement.style.setProperty('--char-length', String(this.charElements.length));
+    [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
       if (window.getComputedStyle(whitespace).getPropertyValue('display') !== 'inline') whitespace.innerHTML = '&nbsp;';
     });
-    this.root.setAttribute('data-text-splitter-initialized', '');
+    this.rootElement.setAttribute('data-text-splitter-initialized', '');
   }
 
-  private nobr(node = this.dom): void {
+  private nobr(node = this.domElement): void {
     if (node.nodeType === Node.TEXT_NODE) {
       let text = node.textContent!;
       let matches = [...text.matchAll(NOBR_REGEXP)];
@@ -101,7 +101,7 @@ class TextSplitter {
     }
   }
 
-  private split(by: 'word' | 'char', node = this.dom): void {
+  private split(by: 'word' | 'char', node = this.domElement): void {
     let list = this[`${by}s` as 'words' | 'chars'];
     [...node.childNodes].forEach(node => {
       if (node.nodeType === Node.TEXT_NODE) {
@@ -164,7 +164,7 @@ class TextSplitter {
       if (LBR_INSEPARATABLE_REGEXP.test(item.textContent!)) concat(item, LBR_INSEPARATABLE_REGEXP, i);
     });
     if (by === 'char') {
-      this.dom.querySelectorAll('[data-word]:not([data-whitespace])').forEach(span => {
+      this.domElement.querySelectorAll('[data-word]:not([data-whitespace])').forEach(span => {
         if (span.textContent) {
           span.setAttribute('data-word', span.textContent);
         } else {
@@ -175,9 +175,9 @@ class TextSplitter {
   }
 
   revert(): void {
-    this.root.style.removeProperty('--word-length');
-    this.root.style.removeProperty('--char-length');
-    this.root.innerHTML = this.original;
+    this.rootElement.style.removeProperty('--word-length');
+    this.rootElement.style.removeProperty('--char-length');
+    this.rootElement.innerHTML = this.original;
   }
 }
 
