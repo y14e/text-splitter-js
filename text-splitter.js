@@ -88,7 +88,7 @@ class TextSplitter {
   }
 
   split(by, node = this.domElement) {
-    let items = this[`${by}s`];
+    let items = this[`${by}Elements`];
     [...node.childNodes].forEach(node => {
       if (node.nodeType === Node.TEXT_NODE) {
         let segments = [...new Intl.Segmenter(node.parentNode.closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en', by === 'word' && this.settings.wordSegmenter ? { granularity: 'word' } : {}).segment(node.textContent.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))];
@@ -112,7 +112,7 @@ class TextSplitter {
   }
 
   lbr(by) {
-    let items = this[`${by}s`];
+    let items = this[`${by}Elements`];
     let previous = null;
     for (let i = 0; i < items.length; i++) {
       let item = items[i];

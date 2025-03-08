@@ -102,7 +102,7 @@ class TextSplitter {
   }
 
   private split(by: 'word' | 'char', node = this.domElement): void {
-    let items = this[`${by}s` as 'words' | 'chars'];
+    let items = this[`${by}Elements` as 'words' | 'chars'];
     [...node.childNodes].forEach(node => {
       if (node.nodeType === Node.TEXT_NODE) {
         let segments = [...new Intl.Segmenter((node.parentNode as HTMLElement).closest('[lang]')!.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en', by === 'word' && this.settings.wordSegmenter ? { granularity: 'word' } : {}).segment(node.textContent!.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))];
@@ -126,7 +126,7 @@ class TextSplitter {
   }
 
   private lbr(by: 'word' | 'char'): void {
-    let items = this[`${by}s` as 'words' | 'chars'];
+    let items = this[`${by}Elements` as 'words' | 'chars'];
     let previous = null;
     for (let i = 0; i < items.length; i++) {
       let item = items[i];
