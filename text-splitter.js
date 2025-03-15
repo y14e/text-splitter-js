@@ -166,7 +166,7 @@ class TextSplitter {
     }
   }
 
-  revert() {
+  destroy() {
     this.rootElement.removeAttribute('data-text-splitter-initialized');
     ['--word-length', '--char-length'].forEach(name => this.rootElement.style.removeProperty(name));
     this.rootElement.innerHTML = this.original;
