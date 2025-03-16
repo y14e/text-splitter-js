@@ -65,9 +65,9 @@ class TextSplitter {
       char.setAttribute('aria-hidden', 'true');
       char.style.setProperty('--char-index', String(i));
     });
-    this.domElement.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])').forEach(span => {
-      (span as HTMLElement).style.setProperty('display', 'inline-block');
-      (span as HTMLElement).style.setProperty('white-space', 'nowrap');
+    (this.domElement.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])') as unknown as HTMLElement[]).forEach(span => {
+      span.style.setProperty('display', 'inline-block');
+      span.style.setProperty('white-space', 'nowrap');
     });
     this.rootElement.replaceChildren(...this.domElement.childNodes);
     this.rootElement.style.setProperty('--word-length', String(this.wordElements.length));
@@ -102,7 +102,7 @@ class TextSplitter {
   }
 
   private split(by: 'word' | 'char', node = this.domElement): void {
-    let items = this[`${by}Elements`] as HTMLElement[];
+    let items = this[`${by}Elements`];
     [...node.childNodes].forEach(node => {
       let text = node.textContent!;
       if (node.nodeType === Node.TEXT_NODE) {
@@ -127,7 +127,7 @@ class TextSplitter {
   }
 
   private lbr(by: 'word' | 'char'): void {
-    let items = this[`${by}Elements`] as HTMLElement[];
+    let items = this[`${by}Elements`];
     let previous = null;
     for (let i = 0; i < items.length; i++) {
       let item = items[i];
