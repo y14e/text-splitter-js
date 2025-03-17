@@ -14,7 +14,7 @@ class TextSplitter {
   defaults: TextSplitterOptions;
   settings: TextSplitterOptions;
   original: string;
-  domElement: HTMLElement;
+  fragment: DocumentFragment;
   wordElements: HTMLElement[];
   charElements: HTMLElement[];
 
@@ -27,7 +27,8 @@ class TextSplitter {
     };
     this.settings = { ...this.defaults, ...options };
     this.original = this.rootElement.innerHTML;
-    this.domElement = this.rootElement.cloneNode(true) as HTMLElement;
+    this.fragment = document.createDocumentFragment();
+    this.fragment.appendChild(this.rootElement.cloneNode(true));
     this.wordElements = [];
     this.charElements = [];
     this.initialize();
@@ -65,11 +66,11 @@ class TextSplitter {
       char.setAttribute('aria-hidden', 'true');
       char.style.setProperty('--char-index', String(i));
     });
-    (this.domElement.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])') as unknown as HTMLElement[]).forEach(span => {
+    (this.fragment.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])') as unknown as HTMLElement[]).forEach(span => {
       span.style.setProperty('display', 'inline-block');
       span.style.setProperty('white-space', 'nowrap');
     });
-    this.rootElement.replaceChildren(...this.domElement.childNodes);
+    this.rootElement.replaceChildren(...this.fragment.childNodes);
     this.rootElement.style.setProperty('--word-length', String(this.wordElements.length));
     this.rootElement.style.setProperty('--char-length', String(this.charElements.length));
     [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
@@ -78,7 +79,7 @@ class TextSplitter {
     this.rootElement.setAttribute('data-text-splitter-initialized', '');
   }
 
-  private nobr(node = this.domElement): void {
+  private nobr(node = this.fragment as unknown as ChildNode): void {
     if (node.nodeType === Node.TEXT_NODE) {
       let text = node.textContent!;
       let matches = [...text.matchAll(NOBR_REGEXP)];
@@ -101,7 +102,7 @@ class TextSplitter {
     }
   }
 
-  private split(by: 'word' | 'char', node = this.domElement): void {
+  private split(by: 'word' | 'char', node = this.fragment as unknown as ChildNode): void {
     let items = this[`${by}Elements`];
     [...node.childNodes].forEach(node => {
       let text = node.textContent!;
@@ -121,7 +122,7 @@ class TextSplitter {
         (node as HTMLElement).setAttribute('data-word', text);
         items.push(node as HTMLElement);
       } else if (node.hasChildNodes()) {
-        this.split(by, node as HTMLElement);
+        this.split(by, node);
       }
     });
   }
@@ -169,7 +170,7 @@ class TextSplitter {
       if (LBR_INSEPARATABLE_REGEXP.test(item.textContent!)) concat(item, LBR_INSEPARATABLE_REGEXP, i);
     });
     if (by === 'char') {
-      this.domElement.querySelectorAll('[data-word]:not([data-whitespace])').forEach(span => {
+      this.fragment.querySelectorAll('[data-word]:not([data-whitespace])').forEach(span => {
         let text = span.textContent;
         if (text) {
           span.setAttribute('data-word', text);
