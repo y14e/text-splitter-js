@@ -70,7 +70,7 @@ class TextSplitter {
       span.style.setProperty('display', 'inline-block');
       span.style.setProperty('white-space', 'nowrap');
     });
-    this.rootElement.replaceChildren(...this.fragment.childNodes);
+    this.rootElement.replaceChildren(...this.fragment.childNodes[0].childNodes);
     this.rootElement.style.setProperty('--word-length', String(this.wordElements.length));
     this.rootElement.style.setProperty('--char-length', String(this.charElements.length));
     [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
