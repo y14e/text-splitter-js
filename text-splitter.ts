@@ -28,7 +28,7 @@ class TextSplitter {
     this.settings = { ...this.defaults, ...options };
     this.original = this.rootElement.innerHTML;
     this.fragment = document.createDocumentFragment();
-    this.fragment.appendChild(this.rootElement.cloneNode(true));
+    [...this.rootElement.childNodes].forEach(node => this.fragment.appendChild(node.cloneNode(true)));
     this.wordElements = [];
     this.charElements = [];
     this.initialize();
@@ -70,7 +70,7 @@ class TextSplitter {
       span.style.setProperty('display', 'inline-block');
       span.style.setProperty('white-space', 'nowrap');
     });
-    this.rootElement.replaceChildren(...this.fragment.childNodes[0].childNodes);
+    this.rootElement.replaceChildren(...this.fragment.childNodes);
     this.rootElement.style.setProperty('--word-length', String(this.wordElements.length));
     this.rootElement.style.setProperty('--char-length', String(this.charElements.length));
     [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
@@ -107,7 +107,8 @@ class TextSplitter {
     [...node.childNodes].forEach(node => {
       let text = node.textContent!;
       if (node.nodeType === Node.TEXT_NODE) {
-        let segments = [...new Intl.Segmenter((node.parentNode as HTMLElement).closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en', by === 'word' && this.settings.wordSegmenter ? { granularity: 'word' } : {}).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))];
+        let parent = node.parentNode;
+        let segments = [...new Intl.Segmenter(((parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement) as HTMLElement).closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en', by === 'word' && this.settings.wordSegmenter ? { granularity: 'word' } : {}).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))];
         segments.forEach(segment => {
           let span = document.createElement('span');
           let segmentText = segment.segment || ' ';
