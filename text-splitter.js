@@ -13,7 +13,8 @@ class TextSplitter {
     };
     this.settings = { ...this.defaults, ...options };
     this.original = this.rootElement.innerHTML;
-    this.domElement = this.rootElement.cloneNode(true);
+    this.fragment = document.createDocumentFragment();
+    this.fragment.appendChild(this.rootElement.cloneNode(true));
     this.wordElements = [];
     this.charElements = [];
     this.initialize();
@@ -51,11 +52,11 @@ class TextSplitter {
       char.setAttribute('aria-hidden', 'true');
       char.style.setProperty('--char-index', i);
     });
-    this.domElement.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])').forEach(span => {
+    this.fragment.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])').forEach(span => {
       span.style.setProperty('display', 'inline-block');
       span.style.setProperty('white-space', 'nowrap');
     });
-    this.rootElement.replaceChildren(...this.domElement.childNodes);
+    this.rootElement.replaceChildren(...this.fragment.childNodes);
     this.rootElement.style.setProperty('--word-length', this.wordElements.length);
     this.rootElement.style.setProperty('--char-length', this.charElements.length);
     [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
@@ -64,7 +65,7 @@ class TextSplitter {
     this.rootElement.setAttribute('data-text-splitter-initialized', '');
   }
 
-  nobr(node = this.domElement) {
+  nobr(node = this.fragment) {
     if (node.nodeType === Node.TEXT_NODE) {
       let text = node.textContent;
       let matches = [...text.matchAll(NOBR_REGEXP)];
@@ -87,7 +88,7 @@ class TextSplitter {
     }
   }
 
-  split(by, node = this.domElement) {
+  split(by, node = this.fragment) {
     let items = this[`${by}Elements`];
     [...node.childNodes].forEach(node => {
       let text = node.textContent;
@@ -155,7 +156,7 @@ class TextSplitter {
       if (LBR_INSEPARATABLE_REGEXP.test(item.textContent)) concat(item, LBR_INSEPARATABLE_REGEXP, i);
     });
     if (by === 'char') {
-      this.domElement.querySelectorAll('[data-word]:not([data-whitespace])').forEach(span => {
+      this.fragment.querySelectorAll('[data-word]:not([data-whitespace])').forEach(span => {
         let text = span.textContent;
         if (text) {
           span.setAttribute('data-word', text);
