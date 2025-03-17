@@ -13,7 +13,7 @@ class TextSplitter {
     };
     this.settings = { ...this.defaults, ...options };
     this.original = this.rootElement.innerHTML;
-    this.fragment = document.createDocumentFragment();
+    this.fragment = new DocumentFragment();
     [...this.rootElement.childNodes].forEach(node => this.fragment.appendChild(node.cloneNode(true)));
     this.wordElements = [];
     this.charElements = [];
