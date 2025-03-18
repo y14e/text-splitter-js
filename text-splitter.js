@@ -141,13 +141,12 @@ class TextSplitter {
       }
     };
     items.forEach((item, i) => {
-      let text = item.textContent;
-      if (LBR_PROHIBIT_END_REGEXP.test(text)) {
+      if (LBR_PROHIBIT_END_REGEXP.test(item.textContent)) {
         concat(item, LBR_PROHIBIT_END_REGEXP, i);
         let next = items[i + 1];
-        let nextText = next?.textContent;
-        if (next && nextText.trim()) {
-          next.setAttribute(`data-${by}`, (next.textContent = text + nextText));
+        let text = next?.textContent;
+        if (next && text.trim()) {
+          next.setAttribute(`data-${by}`, (next.textContent = item.textContent + text));
           item.remove();
           items.splice(i, 1);
         }
