@@ -107,7 +107,7 @@ class TextSplitter {
     [...node.childNodes].forEach(node => {
       let text = node.textContent!;
       if (node.nodeType === Node.TEXT_NODE) {
-        let parent = node.parentNode;
+        let parent = node.parentNode!;
         let segments = [...new Intl.Segmenter(((parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement) as HTMLElement).closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en', by === 'word' && this.settings.wordSegmenter ? { granularity: 'word' } : {}).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))];
         segments.forEach(segment => {
           let span = document.createElement('span');
@@ -155,10 +155,10 @@ class TextSplitter {
       }
     };
     items.forEach((item: HTMLElement, i: number) => {
-      if (LBR_PROHIBIT_END_REGEXP.test(item.textContent)) {
+      if (LBR_PROHIBIT_END_REGEXP.test(item.textContent!)) {
         concat(item, LBR_PROHIBIT_END_REGEXP, i);
         let next = items[i + 1];
-        let text = next?.textContent;
+        let text = next?.textContent!;
         if (next && text.trim()) {
           next.setAttribute(`data-${by}`, (next.textContent = item.textContent + text));
           item.remove();
