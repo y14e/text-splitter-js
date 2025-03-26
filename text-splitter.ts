@@ -10,13 +10,13 @@ type TextSplitterOptions = {
 };
 
 class TextSplitter {
-  rootElement: HTMLElement;
-  defaults: TextSplitterOptions;
-  settings: TextSplitterOptions;
-  original: string;
-  fragment: DocumentFragment;
-  wordElements: HTMLElement[];
-  charElements: HTMLElement[];
+  private rootElement: HTMLElement;
+  private defaults: TextSplitterOptions;
+  private settings: TextSplitterOptions;
+  private original: string;
+  private fragment: DocumentFragment;
+  private wordElements: HTMLElement[];
+  private charElements: HTMLElement[];
 
   constructor(root: HTMLElement, options?: Partial<TextSplitterOptions>) {
     this.rootElement = root;
