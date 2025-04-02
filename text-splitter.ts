@@ -132,7 +132,7 @@ class TextSplitter {
     let items = this[`${by}Elements`];
     let previous = null;
     for (let i = 0; i < items.length; i++) {
-      let item = items[i];
+      let item = items[i]!;
       let text = item.textContent!;
       if (previous && previous.textContent!.trim() && LBR_PROHIBIT_START_REGEXP.test([...new Intl.Segmenter(item.closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en').segment(text)].shift()!.segment)) {
         previous.setAttribute(`data-${by}`, (previous.textContent += text));
