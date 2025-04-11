@@ -9,7 +9,7 @@ type TextSplitterOptions = {
   wordSegmenter: boolean;
 };
 
-class TextSplitter {
+export class TextSplitter {
   private rootElement: HTMLElement;
   private defaults: TextSplitterOptions;
   private settings: TextSplitterOptions;
@@ -187,5 +187,3 @@ class TextSplitter {
     this.rootElement.innerHTML = this.original;
   }
 }
-
-export default TextSplitter;
