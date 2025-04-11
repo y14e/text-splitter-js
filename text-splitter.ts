@@ -154,7 +154,7 @@ export class TextSplitter {
         next = items[offset];
       }
     };
-    items.forEach((item: HTMLElement, i: number) => {
+    items.forEach((item, i) => {
       if (LBR_PROHIBIT_END_REGEXP.test(item.textContent!)) {
         concat(item, LBR_PROHIBIT_END_REGEXP, i);
         const next = items[i + 1];
@@ -166,7 +166,7 @@ export class TextSplitter {
         }
       }
     });
-    items.forEach((item: HTMLElement, i: number) => {
+    items.forEach((item, i) => {
       if (LBR_INSEPARATABLE_REGEXP.test(item.textContent!)) concat(item, LBR_INSEPARATABLE_REGEXP, i);
     });
     if (by === 'char') {
