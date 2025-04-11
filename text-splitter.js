@@ -1,7 +1,7 @@
-let NOBR_REGEXP = /[[[\P{scx=Han}]&&[\P{scx=Hang}]&&[\P{scx=Hira}]&&[\P{scx=Kana}]&&[\p{L}]]!-,.->@\[-`\{-~\u00A0]+/gv;
-let LBR_PROHIBIT_START_REGEXP = /^[[[\p{Pd}]--[―]]\p{Pe}\p{Pf}\p{Po}\u00A0々〵〻ぁぃぅぇぉっゃゅょゎゕゖ゛-ゞァィゥェォッャュョヮヵヶー-ヾㇰ-ㇿ]|\p{Pi}/v;
-let LBR_PROHIBIT_END_REGEXP = /[\p{Pf}\p{Pi}\p{Ps}\p{Sc}\u00A0]$/u;
-let LBR_INSEPARATABLE_REGEXP = /[―‥…]/u;
+const NOBR_REGEXP = /[[[\P{scx=Han}]&&[\P{scx=Hang}]&&[\P{scx=Hira}]&&[\P{scx=Kana}]&&[\p{L}]]!-,.->@\[-`\{-~\u00A0]+/gv;
+const LBR_PROHIBIT_START_REGEXP = /^[[[\p{Pd}]--[―]]\p{Pe}\p{Pf}\p{Po}\u00A0々〵〻ぁぃぅぇぉっゃゅょゎゕゖ゛-ゞァィゥェォッャュョヮヵヶー-ヾㇰ-ㇿ]|\p{Pi}/v;
+const LBR_PROHIBIT_END_REGEXP = /[\p{Pf}\p{Pi}\p{Ps}\p{Sc}\u00A0]$/u;
+const LBR_INSEPARATABLE_REGEXP = /[―‥…]/u;
 
 class TextSplitter {
   constructor(root, options) {
@@ -30,7 +30,7 @@ class TextSplitter {
       word.setAttribute('translate', 'no');
       word.style.setProperty('--word-index', i);
       if (!word.hasAttribute('data-whitespace')) {
-        let alt = document.createElement('span');
+        const alt = document.createElement('span');
         alt.setAttribute('data-alt', '');
         alt.style.cssText += `
           border: 0;
@@ -67,16 +67,16 @@ class TextSplitter {
 
   nobr(node = this.fragment) {
     if (node.nodeType === Node.TEXT_NODE) {
-      let text = node.textContent;
-      let matches = [...text.matchAll(NOBR_REGEXP)];
+      const text = node.textContent;
+      const matches = [...text.matchAll(NOBR_REGEXP)];
       if (matches.length === 0) return;
       let index = 0;
       matches.forEach(match => {
-        let offset = match.index;
+        const offset = match.index;
         if (offset > index) node.before(text.slice(index, offset));
-        let span = document.createElement('span');
+        const span = document.createElement('span');
         span.setAttribute('data-_nobr_', '');
-        let matched = match[0];
+        const matched = match[0];
         span.textContent = matched;
         node.before(span);
         index = offset + matched.length;
@@ -89,15 +89,15 @@ class TextSplitter {
   }
 
   split(by, node = this.fragment) {
-    let items = this[`${by}Elements`];
+    const items = this[`${by}Elements`];
     [...node.childNodes].forEach(node => {
-      let text = node.textContent;
+      const text = node.textContent;
       if (node.nodeType === Node.TEXT_NODE) {
-        let parent = node.parentNode;
-        let segments = [...new Intl.Segmenter((parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement).closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en', by === 'word' && this.settings.wordSegmenter ? { granularity: 'word' } : {}).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))];
+        const parent = node.parentNode;
+        const segments = [...new Intl.Segmenter((parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement).closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en', by === 'word' && this.settings.wordSegmenter ? { granularity: 'word' } : {}).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))];
         segments.forEach(segment => {
-          let span = document.createElement('span');
-          let text = segment.segment || ' ';
+          const span = document.createElement('span');
+          const text = segment.segment || ' ';
           [by, segment.segment.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach(type => span.setAttribute(`data-${type}`, type !== 'whitespace' ? text : ''));
           span.textContent = text;
           items.push(span);
@@ -115,11 +115,11 @@ class TextSplitter {
   }
 
   lbr(by) {
-    let items = this[`${by}Elements`];
+    const items = this[`${by}Elements`];
     let previous = null;
     for (let i = 0; i < items.length; i++) {
-      let item = items[i];
-      let text = item.textContent;
+      const item = items[i];
+      const text = item.textContent;
       if (previous && previous.textContent.trim() && LBR_PROHIBIT_START_REGEXP.test([...new Intl.Segmenter(item.closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en').segment(text)].shift().segment)) {
         previous.setAttribute(`data-${by}`, (previous.textContent += text));
         item.remove();
@@ -129,8 +129,8 @@ class TextSplitter {
         previous = item;
       }
     }
-    let concat = (item, regexp, index) => {
-      let offset = index + 1;
+    const concat = (item, regexp, index) => {
+      const offset = index + 1;
       let next = items[offset];
       let text;
       while (next && regexp.test((text = next.textContent))) {
@@ -143,8 +143,8 @@ class TextSplitter {
     items.forEach((item, i) => {
       if (LBR_PROHIBIT_END_REGEXP.test(item.textContent)) {
         concat(item, LBR_PROHIBIT_END_REGEXP, i);
-        let next = items[i + 1];
-        let text = next?.textContent;
+        const next = items[i + 1];
+        const text = next?.textContent;
         if (next && text.trim()) {
           next.setAttribute(`data-${by}`, (next.textContent = item.textContent + text));
           item.remove();
@@ -157,7 +157,7 @@ class TextSplitter {
     });
     if (by === 'char') {
       this.fragment.querySelectorAll('[data-word]:not([data-whitespace])').forEach(span => {
-        let text = span.textContent;
+        const text = span.textContent;
         if (text) {
           span.setAttribute('data-word', text);
         } else {
