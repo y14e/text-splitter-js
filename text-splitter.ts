@@ -91,7 +91,7 @@ export class TextSplitter {
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent!;
       const matches = [...text.matchAll(NOBR_REGEXP)];
-      if (matches.length === 0) {
+      if (!matches.length) {
         return;
       }
       let index = 0;
