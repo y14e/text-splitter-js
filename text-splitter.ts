@@ -101,7 +101,7 @@ export class TextSplitter {
           node.before(text.slice(index, offset));
         }
         const span = document.createElement('span');
-        span.setAttribute('data-_nobr_', '');
+        span.setAttribute('data-_nobr', '');
         const matched = match[0];
         span.textContent = matched;
         node.before(span);
@@ -136,8 +136,8 @@ export class TextSplitter {
           node.before(span);
         });
         node.remove();
-      } else if (by === 'word' && node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).hasAttribute('data-_nobr_')) {
-        (node as HTMLElement).removeAttribute('data-_nobr_');
+      } else if (by === 'word' && node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).hasAttribute('data-_nobr')) {
+        (node as HTMLElement).removeAttribute('data-_nobr');
         (node as HTMLElement).setAttribute('data-word', text);
         items.push(node as HTMLElement);
       } else if (node.hasChildNodes()) {
