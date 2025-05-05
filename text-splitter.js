@@ -59,12 +59,16 @@ export class TextSplitter {
       char.style.setProperty('--char-index', String(i));
     });
     this.fragment.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])').forEach(span => {
-      span.style.setProperty('display', 'inline-block');
-      span.style.setProperty('white-space', 'nowrap');
+      Object.assign(span.style, {
+        display: 'inline-block',
+        whiteSpace: 'nowrap',
+      });
     });
     this.rootElement.replaceChildren(...this.fragment.childNodes);
-    this.rootElement.style.setProperty('--word-length', String(this.wordElements.length));
-    this.rootElement.style.setProperty('--char-length', String(this.charElements.length));
+    Object.assign(this.rootElement.style, {
+      '--word-length': String(this.wordElements.length),
+      '--char-length': String(this.charElements.length),
+    });
     [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
       if (window.getComputedStyle(whitespace).getPropertyValue('display') !== 'inline') {
         whitespace.innerHTML = '&nbsp;';
