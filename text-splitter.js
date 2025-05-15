@@ -65,10 +65,8 @@ export class TextSplitter {
       });
     });
     this.rootElement.replaceChildren(...this.fragment.childNodes);
-    Object.assign(this.rootElement.style, {
-      '--word-length': String(this.wordElements.length),
-      '--char-length': String(this.charElements.length),
-    });
+    this.rootElement.style.setProperty('--word-length', String(this.wordElements.length));
+    this.rootElement.style.setProperty('--char-length', String(this.charElements.length));
     [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
       if (window.getComputedStyle(whitespace).getPropertyValue('display') !== 'inline') {
         whitespace.innerHTML = '&nbsp;';
