@@ -119,7 +119,16 @@ export class TextSplitter {
       const text = node.textContent;
       if (node.nodeType === Node.TEXT_NODE) {
         const parent = node.parentNode;
-        const segments = [...new Intl.Segmenter((parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement).closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en', by === 'word' && this.settings.wordSegmenter ? { granularity: 'word' } : {}).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))];
+        const segments = [
+          ...new Intl.Segmenter(
+            (parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement).closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en',
+            by === 'word' && this.settings.wordSegmenter
+              ? {
+                  granularity: 'word',
+                }
+              : {},
+          ).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' ')),
+        ];
         segments.forEach(segment => {
           const span = document.createElement('span');
           const text = segment.segment || ' ';
