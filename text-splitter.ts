@@ -36,10 +36,6 @@ export class TextSplitter {
     });
     this.wordElements = [];
     this.charElements = [];
-    this.initialize();
-  }
-
-  private initialize(): void {
     this.nobr();
     this.split('word');
     if (this.settings.lineBreakingRules && !this.settings.concatChar) {

@@ -22,10 +22,6 @@ export class TextSplitter {
     });
     this.wordElements = [];
     this.charElements = [];
-    this.initialize();
-  }
-
-  initialize() {
     this.nobr();
     this.split('word');
     if (this.settings.lineBreakingRules && !this.settings.concatChar) {
