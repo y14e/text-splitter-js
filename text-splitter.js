@@ -17,11 +17,15 @@ export class TextSplitter {
     };
     this.original = this.rootElement.innerHTML;
     this.fragment = new DocumentFragment();
+    this.wordElements = [];
+    this.charElements = [];
+    this.initialize();
+  }
+
+  initialize() {
     [...this.rootElement.childNodes].forEach(node => {
       this.fragment.appendChild(node.cloneNode(true));
     });
-    this.wordElements = [];
-    this.charElements = [];
     this.nobr();
     this.split('word');
     if (this.settings.lineBreakingRules && !this.settings.concatChar) {
