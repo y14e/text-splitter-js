@@ -36,7 +36,7 @@ export class TextSplitter {
       this.lbr('char');
     }
     this.wordElements.forEach((word, i) => {
-      word.setAttribute('translate', 'no');
+      word.translate = false;
       word.style.setProperty('--word-index', String(i));
       if (!word.hasAttribute('data-whitespace')) {
         const alt = document.createElement('span');
@@ -58,7 +58,7 @@ export class TextSplitter {
       }
     });
     this.charElements.forEach((char, i) => {
-      char.setAttribute('aria-hidden', 'true');
+      char.ariaHidden = 'true';
       char.style.setProperty('--char-index', String(i));
     });
     this.fragment.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])').forEach(span => {
@@ -121,7 +121,7 @@ export class TextSplitter {
         const parent = node.parentNode;
         const segments = [
           ...new Intl.Segmenter(
-            (parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement).closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en',
+            (parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement).closest('[lang]')?.lang || document.documentElement.lang || 'en',
             by === 'word' && this.settings.wordSegmenter
               ? {
                   granularity: 'word',
@@ -156,7 +156,7 @@ export class TextSplitter {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const text = item.textContent;
-      if (previous && previous.textContent.trim() && LBR_PROHIBIT_START_REGEXP.test([...new Intl.Segmenter(item.closest('[lang]')?.getAttribute('lang') || document.documentElement.getAttribute('lang') || 'en').segment(text)].shift().segment)) {
+      if (previous && previous.textContent.trim() && LBR_PROHIBIT_START_REGEXP.test([...new Intl.Segmenter(item.closest('[lang]')?.lang || document.documentElement.lang || 'en').segment(text)].shift().segment)) {
         previous.setAttribute(`data-${by}`, (previous.textContent += text));
         item.remove();
         items.splice(i, 1);
