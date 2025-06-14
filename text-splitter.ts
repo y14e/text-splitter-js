@@ -19,6 +19,9 @@ export class TextSplitter {
   private charElements: HTMLElement[];
 
   constructor(root: HTMLElement, options?: Partial<TextSplitterOptions>) {
+    if (!root) {
+      return;
+    }
     this.rootElement = root;
     this.defaults = {
       concatChar: false,
@@ -34,9 +37,7 @@ export class TextSplitter {
   }
 
   private initialize(): void {
-    [...this.rootElement.childNodes].forEach(node => {
-      this.fragment.appendChild(node.cloneNode(true));
-    });
+    [...this.rootElement.childNodes].forEach(node => this.fragment.appendChild(node.cloneNode(true)));
     this.nobr();
     this.split('word');
     if (this.settings.lineBreakingRules && !this.settings.concatChar) {
@@ -82,9 +83,7 @@ export class TextSplitter {
     Object.entries({
       '--word-length': String(this.wordElements.length),
       '--char-length': String(this.charElements.length),
-    }).forEach(([name, value]) => {
-      this.rootElement.style.setProperty(name, value);
-    });
+    }).forEach(([name, value]) => this.rootElement.style.setProperty(name, value));
     [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
       if (window.getComputedStyle(whitespace).getPropertyValue('display') !== 'inline') {
         whitespace.innerHTML = '&nbsp;';
@@ -118,9 +117,7 @@ export class TextSplitter {
       }
       node.remove();
     } else if (node.hasChildNodes()) {
-      [...node.childNodes].forEach(node => {
-        this.nobr(node as HTMLElement);
-      });
+      [...node.childNodes].forEach(node => this.nobr(node as HTMLElement));
     }
   }
 
@@ -143,9 +140,7 @@ export class TextSplitter {
         segments.forEach(segment => {
           const span = document.createElement('span');
           const text = segment.segment || ' ';
-          [by, segment.segment.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach(type => {
-            span.setAttribute(`data-${type}`, type !== 'whitespace' ? text : '');
-          });
+          [by, segment.segment.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach(type => span.setAttribute(`data-${type}`, type !== 'whitespace' ? text : ''));
           span.textContent = text;
           items.push(span);
           node.before(span);
@@ -218,9 +213,7 @@ export class TextSplitter {
 
   destroy(): void {
     this.rootElement.removeAttribute('data-text-splitter-initialized');
-    ['--word-length', '--char-length'].forEach(name => {
-      this.rootElement.style.removeProperty(name);
-    });
+    ['--word-length', '--char-length'].forEach(name => this.rootElement.style.removeProperty(name));
     this.rootElement.innerHTML = this.original;
   }
 }
