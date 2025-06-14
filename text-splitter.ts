@@ -25,10 +25,7 @@ export class TextSplitter {
       lineBreakingRules: true,
       wordSegmenter: false,
     };
-    this.settings = {
-      ...this.defaults,
-      ...options,
-    };
+    this.settings = { ...this.defaults, ...options };
     this.original = this.rootElement.innerHTML;
     this.fragment = new DocumentFragment();
     this.wordElements = [];
