@@ -10,13 +10,13 @@ const LBR_PROHIBIT_END_REGEXP = /[\p{Pf}\p{Pi}\p{Ps}\p{Sc}\u00A0]$/u;
 const LBR_INSEPARATABLE_REGEXP = /[―‥…]/u;
 
 export class TextSplitter {
-  private rootElement: HTMLElement;
-  private defaults: TextSplitterOptions;
-  private settings: TextSplitterOptions;
-  private original: string;
-  private fragment: DocumentFragment;
-  private wordElements: HTMLElement[];
-  private charElements: HTMLElement[];
+  private rootElement!: HTMLElement;
+  private defaults!: TextSplitterOptions;
+  private settings!: TextSplitterOptions;
+  private original!: string;
+  private fragment!: DocumentFragment;
+  private wordElements!: HTMLElement[];
+  private charElements!: HTMLElement[];
 
   constructor(root: HTMLElement, options?: Partial<TextSplitterOptions>) {
     if (!root) {
