@@ -70,7 +70,7 @@ export class TextSplitter {
       }
     });
     this.charElements.forEach((char, i) => {
-      char.ariaHidden = 'true';
+      char.setAttribute('aria-hidden', 'true');
       char.style.setProperty('--char-index', String(i));
     });
     (this.fragment.querySelectorAll(':is([data-word], [data-char]):not([data-whitespace])') as unknown as HTMLElement[]).forEach(span => {
