@@ -19,6 +19,7 @@ export default class TextSplitter {
     this.fragment = new DocumentFragment();
     this.wordElements = [];
     this.charElements = [];
+    this.destroyed = false;
     this.initialize();
   }
 
@@ -198,8 +199,12 @@ export default class TextSplitter {
   }
 
   destroy() {
+    if (this.destroyed) {
+      return;
+    }
     this.rootElement.removeAttribute('data-text-splitter-initialized');
     ['--word-length', '--char-length'].forEach(name => this.rootElement.style.removeProperty(name));
     this.rootElement.innerHTML = this.original;
+    this.destroyed = true;
   }
 }
