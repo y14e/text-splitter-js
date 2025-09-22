@@ -81,28 +81,32 @@ export default class TextSplitter {
 
   nobr(node = this.fragment) {
     if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent;
+      const text = node.textContent || '';
       const matches = [...text.matchAll(NOBR_REGEXP)];
       if (!matches.length) {
         return;
       }
       let index = 0;
+      const parent = node.parentNode;
+      if (!parent) {
+        return;
+      }
       matches.forEach(match => {
         const offset = match.index;
         if (offset > index) {
-          node.before(text.slice(index, offset));
+          parent.insertBefore(document.createTextNode(text.slice(index, offset)), node);
         }
         const span = document.createElement('span');
         span.setAttribute('data-_nobr', '');
         const matched = match[0];
         span.textContent = matched;
-        node.before(span);
+        parent.insertBefore(span, node);
         index = offset + matched.length;
       });
       if (index < text.length) {
-        node.before(text.slice(index));
+        parent.insertBefore(document.createTextNode(text.slice(index)), node);
       }
-      node.remove();
+      parent.removeChild(node);
     } else if (node.hasChildNodes()) {
       [...node.childNodes].forEach(node => this.nobr(node));
     }
@@ -111,12 +115,20 @@ export default class TextSplitter {
   split(by, node = this.fragment) {
     const items = this[`${by}Elements`];
     [...node.childNodes].forEach(node => {
-      const text = node.textContent;
+      const text = node.textContent || '';
       if (node.nodeType === Node.TEXT_NODE) {
         const parent = node.parentNode;
+        if (!parent) {
+          return;
+        }
+        const start = parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement;
+        if (!(start instanceof HTMLElement)) {
+          throw new TypeError();
+        }
+        const closest = start.closest('[lang]');
         const segments = [
           ...new Intl.Segmenter(
-            (parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement).closest('[lang]')?.lang || document.documentElement.lang || 'en',
+            (closest instanceof HTMLElement && closest.lang) || document.documentElement.lang || 'en',
             by === 'word' && this.settings.wordSegmenter
               ? {
                   granularity: 'word',
@@ -133,7 +145,7 @@ export default class TextSplitter {
           node.before(span);
         });
         node.remove();
-      } else if (by === 'word' && node.nodeType === Node.ELEMENT_NODE && node.hasAttribute('data-_nobr')) {
+      } else if (by === 'word' && node.nodeType === Node.ELEMENT_NODE && node instanceof HTMLElement && node.hasAttribute('data-_nobr')) {
         node.removeAttribute('data-_nobr');
         node.setAttribute('data-word', text);
         items.push(node);
@@ -149,7 +161,12 @@ export default class TextSplitter {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const text = item.textContent;
-      if (previous && previous.textContent.trim() && LBR_PROHIBIT_START_REGEXP.test([...new Intl.Segmenter(item.closest('[lang]')?.lang || document.documentElement.lang || 'en').segment(text)].shift().segment)) {
+      const closest = item.closest('[lang]');
+      const segment = [...new Intl.Segmenter((closest instanceof HTMLElement && closest.lang) || document.documentElement.lang || 'en').segment(text)].shift();
+      if (!segment) {
+        return;
+      }
+      if (previous && previous.textContent.trim() && LBR_PROHIBIT_START_REGEXP.test(segment.segment)) {
         previous.setAttribute(`data-${by}`, (previous.textContent += text));
         item.remove();
         items.splice(i, 1);
