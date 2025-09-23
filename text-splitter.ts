@@ -96,16 +96,13 @@ export default class TextSplitter {
 
   private nobr(node: Node = this.fragment): void {
     if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent || '';
+      const text = node.textContent!;
       const matches = [...text.matchAll(NOBR_REGEXP)];
       if (!matches.length) {
         return;
       }
       let index = 0;
-      const parent = node.parentNode;
-      if (!parent) {
-        return;
-      }
+      const parent = node.parentNode!;
       matches.forEach(match => {
         const offset = match.index;
         if (offset > index) {
@@ -130,30 +127,21 @@ export default class TextSplitter {
   private split(by: 'word' | 'char', node: Node = this.fragment): void {
     const items = this[`${by}Elements`];
     [...node.childNodes].forEach(node => {
-      const text = node.textContent || '';
+      const text = node.textContent!;
       if (node.nodeType === Node.TEXT_NODE) {
-        const parent = node.parentNode;
-        if (!parent) {
-          return;
-        }
-        const start = parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement;
-        if (!(start instanceof HTMLElement)) {
-          throw new TypeError();
-        }
-        const closest = start.closest('[lang]');
-        const segments = [
+        const parent = node.parentNode!;
+        [
           ...new Intl.Segmenter(
-            (closest instanceof HTMLElement && closest.lang) || document.documentElement.lang || 'en',
+            (((parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement) as HTMLElement).closest('[lang]') as HTMLElement)?.lang || document.documentElement.lang || 'en',
             by === 'word' && this.settings.wordSegmenter
               ? {
                   granularity: 'word',
                 }
               : {},
           ).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' ')),
-        ];
-        segments.forEach(segment => {
+        ].forEach(segment => {
           const span = document.createElement('span');
-          const text = segment.segment || ' ';
+          const text = segment.segment;
           [by, segment.segment.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach(type => span.setAttribute(`data-${type}`, type !== 'whitespace' ? text : ''));
           span.textContent = text;
           items.push(span);
