@@ -115,16 +115,7 @@ export default class TextSplitter {
       const text = node.textContent;
       if (node.nodeType === Node.TEXT_NODE) {
         const parent = node.parentNode;
-        [
-          ...new Intl.Segmenter(
-            (parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement).closest('[lang]')?.lang || document.documentElement.lang || 'en',
-            by === 'word' && this.settings.wordSegmenter
-              ? {
-                  granularity: 'word',
-                }
-              : {},
-          ).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' ')),
-        ].forEach(segment => {
+        [...new Intl.Segmenter((parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement).closest('[lang]')?.lang || document.documentElement.lang || 'en', by === 'word' && this.settings.wordSegmenter ? { granularity: 'word' } : {}).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))].forEach(segment => {
           const span = document.createElement('span');
           const text = segment.segment;
           [by, segment.segment.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach(type => span.setAttribute(`data-${type}`, type !== 'whitespace' ? text : ''));
@@ -149,8 +140,7 @@ export default class TextSplitter {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const text = item.textContent;
-      const closest = item.closest('[lang]');
-      const segment = [...new Intl.Segmenter((closest instanceof HTMLElement && closest.lang) || document.documentElement.lang || 'en').segment(text)].shift();
+      const segment = [...new Intl.Segmenter(item.closest('[lang]')?.lang || document.documentElement.lang || 'en').segment(text)].shift();
       if (!segment) {
         return;
       }
