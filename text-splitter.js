@@ -5,9 +5,7 @@ const LBR_INSEPARATABLE_REGEXP = /[―‥…]/u;
 
 export default class TextSplitter {
   constructor(root, options) {
-    if (!root) {
-      return;
-    }
+    if (!root) return;
     this.rootElement = root;
     this.defaults = {
       concatChar: false,
@@ -27,13 +25,9 @@ export default class TextSplitter {
     [...this.rootElement.childNodes].forEach(node => this.fragment.appendChild(node.cloneNode(true)));
     this.nobr();
     this.split('word');
-    if (this.settings.lineBreakingRules && !this.settings.concatChar) {
-      this.lbr('word');
-    }
+    if (this.settings.lineBreakingRules && !this.settings.concatChar) this.lbr('word');
     this.split('char');
-    if (this.settings.lineBreakingRules && this.settings.concatChar) {
-      this.lbr('char');
-    }
+    if (this.settings.lineBreakingRules && this.settings.concatChar) this.lbr('char');
     this.wordElements.forEach((word, i) => {
       word.translate = false;
       word.style.setProperty('--word-index', String(i));
@@ -72,9 +66,7 @@ export default class TextSplitter {
       '--char-length': String(this.charElements.length),
     }).forEach(([name, value]) => this.rootElement.style.setProperty(name, value));
     [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach(whitespace => {
-      if (window.getComputedStyle(whitespace).getPropertyValue('display') !== 'inline') {
-        whitespace.innerHTML = '&nbsp;';
-      }
+      if (window.getComputedStyle(whitespace).getPropertyValue('display') !== 'inline') whitespace.innerHTML = '&nbsp;';
     });
     this.rootElement.setAttribute('data-text-splitter-initialized', '');
   }
@@ -83,16 +75,12 @@ export default class TextSplitter {
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent;
       const matches = [...text.matchAll(NOBR_REGEXP)];
-      if (!matches.length) {
-        return;
-      }
+      if (!matches.length) return;
       let index = 0;
       const parent = node.parentNode;
       matches.forEach(match => {
         const offset = match.index;
-        if (offset > index) {
-          parent.insertBefore(document.createTextNode(text.slice(index, offset)), node);
-        }
+        if (offset > index) parent.insertBefore(document.createTextNode(text.slice(index, offset)), node);
         const span = document.createElement('span');
         span.setAttribute('data-_nobr', '');
         const matched = match[0];
@@ -100,9 +88,7 @@ export default class TextSplitter {
         parent.insertBefore(span, node);
         index = offset + matched.length;
       });
-      if (index < text.length) {
-        parent.insertBefore(document.createTextNode(text.slice(index)), node);
-      }
+      if (index < text.length) parent.insertBefore(document.createTextNode(text.slice(index)), node);
       parent.removeChild(node);
     } else if (node.hasChildNodes()) {
       [...node.childNodes].forEach(node => this.nobr(node));
@@ -141,9 +127,7 @@ export default class TextSplitter {
       const item = items[i];
       const text = item.textContent;
       const segment = [...new Intl.Segmenter(item.closest('[lang]')?.lang || document.documentElement.lang || 'en').segment(text)].shift();
-      if (!segment) {
-        return;
-      }
+      if (!segment) return;
       if (previous && previous.textContent.trim() && LBR_PROHIBIT_START_REGEXP.test(segment.segment)) {
         previous.setAttribute(`data-${by}`, (previous.textContent += text));
         item.remove();
@@ -177,9 +161,7 @@ export default class TextSplitter {
       }
     });
     items.forEach((item, i) => {
-      if (LBR_INSEPARATABLE_REGEXP.test(item.textContent)) {
-        concat(item, LBR_INSEPARATABLE_REGEXP, i);
-      }
+      if (LBR_INSEPARATABLE_REGEXP.test(item.textContent)) concat(item, LBR_INSEPARATABLE_REGEXP, i);
     });
     if (by === 'char') {
       this.fragment.querySelectorAll('[data-word]:not([data-whitespace])').forEach(span => {
@@ -194,9 +176,7 @@ export default class TextSplitter {
   }
 
   destroy() {
-    if (this.destroyed) {
-      return;
-    }
+    if (this.destroyed) return;
     this.rootElement.removeAttribute('data-text-splitter-initialized');
     ['--word-length', '--char-length'].forEach(name => this.rootElement.style.removeProperty(name));
     this.rootElement.innerHTML = this.original;
