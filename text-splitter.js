@@ -137,7 +137,7 @@ export default class TextSplitter {
         previous = item;
       }
     }
-    function concat(item, regexp, index) {
+    const concat = (item, regexp, index) => {
       const offset = index + 1;
       let next = items[offset];
       let text;
@@ -147,7 +147,7 @@ export default class TextSplitter {
         items.splice(offset, 1);
         next = items[offset];
       }
-    }
+    };
     items.forEach((item, i) => {
       if (LBR_PROHIBIT_END_REGEXP.test(item.textContent)) {
         concat(item, LBR_PROHIBIT_END_REGEXP, i);
