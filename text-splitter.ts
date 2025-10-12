@@ -116,7 +116,14 @@ export default class TextSplitter {
       const text = node.textContent!;
       if (node.nodeType === Node.TEXT_NODE) {
         const parent = node.parentNode!;
-        [...new Intl.Segmenter((((parent.nodeType === Node.ELEMENT_NODE ? parent : this.rootElement) as HTMLElement).closest('[lang]') as HTMLElement)?.lang || document.documentElement.lang || 'en', by === 'word' && this.settings.wordSegmenter ? { granularity: 'word' } : {}).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))].forEach(segment => {
+        function segmenter(self: TextSplitter): Intl.Segmenter {
+          if (by === 'word' && self.settings.wordSegmenter) {
+            return new Intl.Segmenter((((parent.nodeType === Node.ELEMENT_NODE ? parent : self.rootElement) as HTMLElement).closest('[lang]') as HTMLElement)?.lang || document.documentElement.lang || 'en', { granularity: 'word' });
+          } else {
+            return new Intl.Segmenter();
+          }
+        }
+        [...segmenter(this).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))].forEach(segment => {
           const span = document.createElement('span');
           const text = segment.segment;
           [by, segment.segment.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach(type => span.setAttribute(`data-${type}`, type !== 'whitespace' ? text : ''));
@@ -141,7 +148,7 @@ export default class TextSplitter {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const text = item.textContent;
-      const segment = [...new Intl.Segmenter((item.closest('[lang]') as HTMLElement)?.lang || document.documentElement.lang || 'en').segment(text)].shift();
+      const segment = [...new Intl.Segmenter().segment(text)].shift();
       if (!segment) return;
       if (previous && previous.textContent.trim() && LBR_PROHIBIT_START_REGEXP.test(segment.segment)) {
         previous.setAttribute(`data-${by}`, (previous.textContent += text));
