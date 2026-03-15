@@ -87,7 +87,7 @@ export default class TextSplitter {
       '--char-length': String(this.charElements.length),
     }).forEach(([name, value]) => this.rootElement.style.setProperty(name, value));
     [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach((whitespace) => {
-      if (window.getComputedStyle(whitespace).getPropertyValue('display') !== 'inline') {
+      if (getComputedStyle(whitespace).getPropertyValue('display') !== 'inline') {
         whitespace.innerHTML = '&nbsp;';
       }
     });
