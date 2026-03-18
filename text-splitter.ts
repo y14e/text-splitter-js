@@ -219,9 +219,9 @@ export default class TextSplitter {
     if (this.destroyed) {
       return;
     }
+    this.destroyed = true;
     this.rootElement.removeAttribute('data-text-splitter-initialized');
     ['--word-length', '--char-length'].forEach((name) => this.rootElement.style.removeProperty(name));
     this.rootElement.innerHTML = this.original;
-    this.destroyed = true;
   }
 }
