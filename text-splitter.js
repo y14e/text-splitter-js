@@ -4,7 +4,7 @@ const LBR_PROHIBIT_END_REGEXP = /[\p{Pf}\p{Pi}\p{Ps}\p{Sc}\u00A0]$/u;
 const LBR_INSEPARATABLE_REGEXP = /[―‥…]/u;
 
 export default class TextSplitter {
-  constructor(root, options) {
+  constructor(root, options = {}) {
     if (!root) {
       return;
     }

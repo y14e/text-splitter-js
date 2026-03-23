@@ -19,7 +19,7 @@ export default class TextSplitter {
   private charElements!: HTMLElement[];
   private destroyed!: boolean;
 
-  constructor(root: HTMLElement, options?: Partial<TextSplitterOptions>) {
+  constructor(root: HTMLElement, options: Partial<TextSplitterOptions> = {}) {
     if (!root) {
       return;
     }
