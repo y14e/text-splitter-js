@@ -117,7 +117,7 @@ export default class TextSplitter {
         const parent = node.parentNode;
         function segmenter(self) {
           if (by === 'word' && self.settings.wordSegmenter) {
-            return new Intl.Segmenter((parent.nodeType === Node.ELEMENT_NODE ? parent : self.rootElement).closest('[lang]')?.lang || document.documentElement.lang || 'en', { granularity: 'word' });
+            return new Intl.Segmenter((parent.nodeType === Node.ELEMENT_NODE ? parent : self.rootElement).closest('[lang]')?.lang ?? document.documentElement.lang ?? 'en', { granularity: 'word' });
           } else {
             return new Intl.Segmenter();
           }
