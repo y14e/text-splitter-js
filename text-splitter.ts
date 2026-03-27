@@ -76,16 +76,12 @@ export default class TextSplitter {
       char.style.setProperty('--char-index', String(i));
     });
     this.fragment.querySelectorAll<HTMLElement>(':is([data-word], [data-char]):not([data-whitespace])').forEach((span) => {
-      Object.assign(span.style, {
-        display: 'inline-block',
-        whiteSpace: 'nowrap',
-      });
+      span.style.setProperty('display', 'inline-block');
+      span.style.setProperty('white-space', 'nowrap');
     });
     this.rootElement.replaceChildren(...this.fragment.childNodes);
-    Object.entries({
-      '--word-length': String(this.wordElements.length),
-      '--char-length': String(this.charElements.length),
-    }).forEach(([name, value]) => this.rootElement.style.setProperty(name, value));
+    this.rootElement.style.setProperty('--word-length', String(this.wordElements.length));
+    this.rootElement.style.setProperty('--char-length', String(this.charElements.length));
     [...this.rootElement.querySelectorAll(':scope > :not([data-word]) [data-char][data-whitespace]')].forEach((whitespace) => {
       if (getComputedStyle(whitespace).getPropertyValue('display') !== 'inline') {
         whitespace.innerHTML = '&nbsp;';
