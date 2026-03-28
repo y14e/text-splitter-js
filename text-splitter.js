@@ -5,9 +5,7 @@ const LBR_INSEPARATABLE_REGEXP = /[―‥…]/u;
 
 export default class TextSplitter {
   constructor(root, options = {}) {
-    if (!root) {
-      return;
-    }
+    if (!root) return;
     this.rootElement = root;
     this.defaults = {
       concatChar: false,
@@ -79,9 +77,7 @@ export default class TextSplitter {
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent;
       const matches = [...text.matchAll(NOBR_REGEXP)];
-      if (!matches.length) {
-        return;
-      }
+      if (!matches.length) return;
       let index = 0;
       const parent = node.parentNode;
       matches.forEach((match) => {
@@ -144,9 +140,7 @@ export default class TextSplitter {
       const item = items[i];
       const text = item.textContent;
       const segment = [...new Intl.Segmenter().segment(text)].shift();
-      if (!segment) {
-        return;
-      }
+      if (!segment) return;
       if (previous && previous.textContent.trim() && LBR_PROHIBIT_START_REGEXP.test(segment.segment)) {
         previous.setAttribute(`data-${by}`, (previous.textContent += text));
         item.remove();
@@ -197,9 +191,7 @@ export default class TextSplitter {
   }
 
   destroy() {
-    if (this.destroyed) {
-      return;
-    }
+    if (this.destroyed) return;
     this.destroyed = true;
     this.rootElement.removeAttribute('data-text-splitter-initialized');
     ['--word-length', '--char-length'].forEach((name) => this.rootElement.style.removeProperty(name));
