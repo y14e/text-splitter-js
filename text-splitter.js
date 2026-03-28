@@ -97,38 +97,37 @@ export default class TextSplitter {
       }
       parent.removeChild(node);
     } else if (node.hasChildNodes()) {
-      [...node.childNodes].forEach((node) => this.nobr(node));
+      [...node.childNodes].forEach((n) => this.nobr(n));
     }
   }
 
   split(by, node = this.fragment) {
     const items = this[`${by}Elements`];
-    [...node.childNodes].forEach((node) => {
-      const text = node.textContent;
-      if (node.nodeType === Node.TEXT_NODE) {
-        const parent = node.parentNode;
-        function segmenter(self) {
+    [...node.childNodes].forEach((n) => {
+      const text = n.textContent;
+      if (n.nodeType === Node.TEXT_NODE) {
+        const parent = n.parentNode;
+        const segmenter = (self) => {
           if (by === 'word' && self.settings.wordSegmenter) {
             return new Intl.Segmenter((parent.nodeType === Node.ELEMENT_NODE ? parent : self.rootElement).closest('[lang]')?.lang ?? document.documentElement.lang ?? 'en', { granularity: 'word' });
-          } else {
-            return new Intl.Segmenter();
           }
-        }
+          return new Intl.Segmenter();
+        };
         [...segmenter(this).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))].forEach((segment) => {
           const span = document.createElement('span');
-          const text = segment.segment;
-          [by, segment.segment.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach((type) => span.setAttribute(`data-${type}`, type !== 'whitespace' ? text : ''));
-          span.textContent = text;
+          const t = segment.segment;
+          [by, t.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach((type) => span.setAttribute(`data-${type}`, type !== 'whitespace' ? t : ''));
+          span.textContent = t;
           items.push(span);
-          node.before(span);
+          n.before(span);
         });
-        node.remove();
-      } else if (by === 'word' && node.nodeType === Node.ELEMENT_NODE && node instanceof HTMLElement && node.hasAttribute('data-_nobr')) {
-        node.removeAttribute('data-_nobr');
-        node.setAttribute('data-word', text);
-        items.push(node);
-      } else if (node.hasChildNodes()) {
-        this.split(by, node);
+        n.remove();
+      } else if (by === 'word' && n.nodeType === Node.ELEMENT_NODE && n instanceof HTMLElement && n.hasAttribute('data-_nobr')) {
+        n.removeAttribute('data-_nobr');
+        n.setAttribute('data-word', text);
+        items.push(n);
+      } else if (n.hasChildNodes()) {
+        this.split(by, n);
       }
     });
   }
@@ -145,7 +144,7 @@ export default class TextSplitter {
         previous.setAttribute(`data-${by}`, (previous.textContent += text));
         item.remove();
         items.splice(i, 1);
-        i--;
+        i -= 1;
       } else {
         previous = item;
       }
