@@ -37,7 +37,7 @@ export default class TextSplitter {
   }
 
   private initialize(): void {
-    [...this.rootElement.childNodes].forEach((node) => void this.fragment.appendChild(node.cloneNode(true)));
+    [...this.rootElement.childNodes].forEach((node) => this.fragment.appendChild(node.cloneNode(true)));
     this.nobr();
     this.split('word');
     if (this.settings.lineBreakingRules && !this.settings.concatChar) {
@@ -112,7 +112,7 @@ export default class TextSplitter {
       }
       parent.removeChild(node);
     } else if (node.hasChildNodes()) {
-      [...node.childNodes].forEach((node) => void this.nobr(node));
+      [...node.childNodes].forEach((node) => this.nobr(node));
     }
   }
 
@@ -131,7 +131,7 @@ export default class TextSplitter {
         [...segmenter(this).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))].forEach((segment) => {
           const span = document.createElement('span');
           const text = segment.segment;
-          [by, text.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach((type) => void span.setAttribute(`data-${type}`, type !== 'whitespace' ? text : ''));
+          [by, text.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach((type) => span.setAttribute(`data-${type}`, type !== 'whitespace' ? text : ''));
           span.textContent = text;
           items.push(span);
           node.before(span);
@@ -212,7 +212,7 @@ export default class TextSplitter {
     if (this.destroyed) return;
     this.destroyed = true;
     this.rootElement.removeAttribute('data-text-splitter-initialized');
-    ['--word-length', '--char-length'].forEach((name) => void this.rootElement.style.removeProperty(name));
+    ['--word-length', '--char-length'].forEach((name) => this.rootElement.style.removeProperty(name));
     this.rootElement.innerHTML = this.original;
   }
 }
