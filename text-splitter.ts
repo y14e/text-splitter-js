@@ -149,7 +149,7 @@ export default class TextSplitter {
 
   private lbr(by: 'word' | 'char'): void {
     const items = this[`${by}Elements`];
-    let previous = null;
+    let previous: HTMLElement | undefined;
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const text = item.textContent;

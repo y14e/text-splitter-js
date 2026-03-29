@@ -134,7 +134,7 @@ export default class TextSplitter {
 
   lbr(by) {
     const items = this[`${by}Elements`];
-    let previous = null;
+    let previous;
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const text = item.textContent;
