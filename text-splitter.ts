@@ -37,7 +37,7 @@ export default class TextSplitter {
   }
 
   private initialize(): void {
-    [...this.rootElement.childNodes].forEach((node) => this.fragment.appendChild(node.cloneNode(true)));
+    [...this.rootElement.childNodes].forEach((node) => void this.fragment.appendChild(node.cloneNode(true)));
     this.nobr();
     this.split('word');
     if (this.settings.lineBreakingRules && !this.settings.concatChar) {
@@ -90,11 +90,11 @@ export default class TextSplitter {
 
   private nobr(node: Node = this.fragment): void {
     if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent!;
+      const text = node.textContent;
       const matches = [...text.matchAll(NOBR_REGEXP)];
       if (!matches.length) return;
       let index = 0;
-      const parent = node.parentNode!;
+      const parent = node.parentNode;
       matches.forEach((match) => {
         const offset = match.index;
         if (offset > index) {
@@ -112,16 +112,16 @@ export default class TextSplitter {
       }
       parent.removeChild(node);
     } else if (node.hasChildNodes()) {
-      [...node.childNodes].forEach((n) => this.nobr(n));
+      [...node.childNodes].forEach((node) => void this.nobr(node));
     }
   }
 
   private split(by: 'word' | 'char', node: Node = this.fragment): void {
     const items = this[`${by}Elements`];
-    [...node.childNodes].forEach((n) => {
-      const text = n.textContent!;
-      if (n.nodeType === Node.TEXT_NODE) {
-        const parent = n.parentNode!;
+    [...node.childNodes].forEach((node) => {
+      const text = node.textContent;
+      if (node.nodeType === Node.TEXT_NODE) {
+        const parent = node.parentNode;
         const segmenter = (self: TextSplitter): Intl.Segmenter => {
           if (by === 'word' && self.settings.wordSegmenter) {
             return new Intl.Segmenter((((parent.nodeType === Node.ELEMENT_NODE ? parent : self.rootElement) as HTMLElement).closest('[lang]') as HTMLElement)?.lang ?? document.documentElement.lang ?? 'en', { granularity: 'word' });
@@ -130,19 +130,19 @@ export default class TextSplitter {
         };
         [...segmenter(this).segment(text.replace(/[\r\n\t]/g, '').replace(/\s{2,}/g, ' '))].forEach((segment) => {
           const span = document.createElement('span');
-          const t = segment.segment;
-          [by, t.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach((type) => span.setAttribute(`data-${type}`, type !== 'whitespace' ? t : ''));
-          span.textContent = t;
+          const text = segment.segment;
+          [by, text.charCodeAt(0) === 32 && 'whitespace'].filter(Boolean).forEach((type) => void span.setAttribute(`data-${type}`, type !== 'whitespace' ? text : ''));
+          span.textContent = text;
           items.push(span);
-          n.before(span);
+          node.before(span);
         });
-        n.remove();
-      } else if (by === 'word' && n.nodeType === Node.ELEMENT_NODE && n instanceof HTMLElement && n.hasAttribute('data-_nobr')) {
-        n.removeAttribute('data-_nobr');
-        n.setAttribute('data-word', text);
-        items.push(n);
-      } else if (n.hasChildNodes()) {
-        this.split(by, n);
+        node.remove();
+      } else if (by === 'word' && node.nodeType === Node.ELEMENT_NODE && node instanceof HTMLElement && node.hasAttribute('data-_nobr')) {
+        node.removeAttribute('data-_nobr');
+        node.setAttribute('data-word', text);
+        items.push(node);
+      } else if (node.hasChildNodes()) {
+        this.split(by, node);
       }
     });
   }
@@ -155,8 +155,9 @@ export default class TextSplitter {
       const text = item.textContent;
       const segment = [...new Intl.Segmenter().segment(text)].shift();
       if (!segment) return;
-      if (previous && previous.textContent.trim() && LBR_PROHIBIT_START_REGEXP.test(segment.segment)) {
-        previous.setAttribute(`data-${by}`, (previous.textContent += text));
+      if (previous?.textContent.trim() && LBR_PROHIBIT_START_REGEXP.test(segment.segment)) {
+        previous.textContent += text;
+        previous.setAttribute(`data-${by}`, previous.textContent);
         item.remove();
         items.splice(i, 1);
         i -= 1;
@@ -167,9 +168,11 @@ export default class TextSplitter {
     const concat = (item: HTMLElement, regexp: RegExp, index: number): void => {
       const offset = index + 1;
       let next = items[offset];
-      let text: string;
-      while (next && regexp.test((text = next.textContent))) {
-        item.setAttribute(`data-${by}`, (item.textContent += text));
+      while (next) {
+        const text = next.textContent;
+        if (!regexp.test(text)) break;
+        item.textContent += text;
+        item.setAttribute(`data-${by}`, item.textContent);
         next.remove();
         items.splice(offset, 1);
         next = items[offset];
@@ -181,7 +184,8 @@ export default class TextSplitter {
         const next = items[i + 1];
         const text = next?.textContent;
         if (next && text.trim()) {
-          next.setAttribute(`data-${by}`, (next.textContent = item.textContent + text));
+          next.textContent = item.textContent + text;
+          next.setAttribute(`data-${by}`, next.textContent);
           item.remove();
           items.splice(i, 1);
         }
@@ -208,7 +212,7 @@ export default class TextSplitter {
     if (this.destroyed) return;
     this.destroyed = true;
     this.rootElement.removeAttribute('data-text-splitter-initialized');
-    ['--word-length', '--char-length'].forEach((name) => this.rootElement.style.removeProperty(name));
+    ['--word-length', '--char-length'].forEach((name) => void this.rootElement.style.removeProperty(name));
     this.rootElement.innerHTML = this.original;
   }
 }
