@@ -86,7 +86,7 @@ export default class TextSplitter {
           parent.insertBefore(document.createTextNode(text.slice(index, offset)), node);
         }
         const span = document.createElement('span');
-        span.setAttribute('data-_nobr', '');
+        span.setAttribute('data-text-splitter-__nobr__', '');
         const matched = match[0];
         span.textContent = matched;
         parent.insertBefore(span, node);
@@ -122,8 +122,8 @@ export default class TextSplitter {
           node.before(span);
         });
         node.remove();
-      } else if (by === 'word' && node.nodeType === Node.ELEMENT_NODE && node instanceof HTMLElement && node.hasAttribute('data-_nobr')) {
-        node.removeAttribute('data-_nobr');
+      } else if (by === 'word' && node.nodeType === Node.ELEMENT_NODE && node instanceof HTMLElement && node.hasAttribute('data-text-splitter-__nobr__')) {
+        node.removeAttribute('data-text-splitter-__nobr__');
         node.setAttribute('data-word', text);
         items.push(node);
       } else if (node.hasChildNodes()) {
